@@ -8,11 +8,19 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
-ASimpleCharacter::ASimpleCharacter() : 
+ASimpleCharacter::ASimpleCharacter() :
+	// Control parameters
 	BaseTurnRate(50.f),
 	BaseLookupRate(50.f),
 	MouseTurnRate(1.f),
-	MouseLookupRate(1.f)
+	MouseLookupRate(1.f),
+	// Movement parameters
+	BaseMovementSpeed(650.f),
+	RunSpeed(1200.f),
+	WalkSpeed(650.f),
+	bIsRunning(false),
+	RollHoldTime(1.f),
+	bRollButtonPressed(false)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -20,7 +28,7 @@ ASimpleCharacter::ASimpleCharacter() :
 	// Create the camera boom
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 200.f;
+	CameraBoom->TargetArmLength = 400.f;
 	CameraBoom->SocketOffset = FVector(0.f, 100.f, 100.f);
 	
 	// Rotate arm based on the controller
@@ -33,10 +41,10 @@ ASimpleCharacter::ASimpleCharacter() :
 	FollowCamera->bUsePawnControlRotation = false;
 
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = true;
+	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	GetCharacterMovement()->bOrientRotationToMovement = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
@@ -105,6 +113,73 @@ void ASimpleCharacter::Lookup(float Value)
 	AddControllerPitchInput(MouseLookupRate * Value);
 }
 
+void ASimpleCharacter::RollRunPressed()
+{
+	bRollButtonPressed = true;
+	SetRollTimer();
+}
+
+void ASimpleCharacter::RollRunHold()
+{
+	if (bRollButtonPressed)
+	{
+		Run();
+		SetRollTimer();
+	}
+}
+
+void ASimpleCharacter::RollRunReleased()
+{
+	bRollButtonPressed = false;
+	if (bIsRunning)
+	{
+		StopRunning();
+	}
+	else
+	{
+		Roll();
+	}
+}
+
+void ASimpleCharacter::SetRollTimer()
+{
+	GetWorldTimerManager().SetTimer(
+		RollHoldTimer,
+		this,
+		&ASimpleCharacter::RollRunHold,
+		RollHoldTime);
+}
+
+void ASimpleCharacter::Run()
+{
+	bIsRunning = true;
+	BaseMovementSpeed = RunSpeed;
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Started Running..."));
+	}
+}
+
+void ASimpleCharacter::StopRunning()
+{
+	bIsRunning = false;
+	BaseMovementSpeed = WalkSpeed;
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Stopped Running!"));
+	}
+}
+
+void ASimpleCharacter::Roll()
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Rolling..."));
+	}
+}
+
 // Called every frame
 void ASimpleCharacter::Tick(float DeltaTime)
 {
@@ -126,5 +201,7 @@ void ASimpleCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("Turn", this, &ASimpleCharacter::Turn);
 	PlayerInputComponent->BindAxis("LookUp", this, &ASimpleCharacter::Lookup);
 
+	PlayerInputComponent->BindAction("RollRun", IE_Pressed, this, &ASimpleCharacter::RollRunPressed);
+	PlayerInputComponent->BindAction("RollRun", IE_Released, this, &ASimpleCharacter::RollRunReleased);
 }
 

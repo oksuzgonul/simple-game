@@ -13,5 +13,15 @@ UCLASS()
 class DOWPREP_API USimpleAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
-	
+public:
+	USimpleAnimInstance();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateAnimationProperties(float DeltaTime);
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	class ASimpleCharacter* SimpleCharacter;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	float Speed;
 };

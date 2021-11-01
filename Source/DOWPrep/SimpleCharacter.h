@@ -45,6 +45,23 @@ protected:
 	*/
 	void Lookup(float Value);
 
+	/** 
+	* Action bound to RollRun input.
+	* Tap for roll pressed for run
+	*/
+	void RollRunPressed();
+	void RollRunHold();
+	void RollRunReleased();
+	void SetRollTimer();
+
+	/** Character speed is increased and run animation is activated by setting bIsRunning boolean */
+	void Run();
+	/** Reverse what Run() does */
+	void StopRunning();
+
+	/** Character performs a roll */
+	void Roll();
+
 private:
 	// Follow camera will be mounted on the camera boom
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -70,11 +87,27 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true", ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
 	float MouseLookupRate;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	float BaseMovementSpeed;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	float RunSpeed;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	float WalkSpeed;
+
+	// is the character running?
+	bool bIsRunning;
+	FTimerHandle RollHoldTimer;
+	float RollHoldTime;
+
+	// is the RollRun button pressed?
+	bool bRollButtonPressed;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 };
