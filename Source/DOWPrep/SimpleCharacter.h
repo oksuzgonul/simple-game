@@ -93,9 +93,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	float RunSpeed;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	float WalkSpeed;
-
 	// is the character running?
 	bool bIsRunning;
 	FTimerHandle RollHoldTimer;
@@ -110,4 +107,6 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	FORCEINLINE bool IsRunning() const { return bIsRunning; }
 };

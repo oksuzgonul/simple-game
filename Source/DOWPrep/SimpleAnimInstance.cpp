@@ -4,7 +4,9 @@
 #include "SimpleAnimInstance.h"
 #include "SimpleCharacter.h"
 
-USimpleAnimInstance::USimpleAnimInstance() {
+USimpleAnimInstance::USimpleAnimInstance() :
+	bIsRunning(false)
+{
 
 }
 
@@ -20,5 +22,6 @@ void USimpleAnimInstance::UpdateAnimationProperties(float DeltaTime)
 		FVector Velocity{ SimpleCharacter->GetVelocity() };
 		Velocity.Z = 0;
 		Speed = Velocity.Size();
+		bIsRunning = SimpleCharacter->IsRunning();
 	}
 }

@@ -17,7 +17,6 @@ ASimpleCharacter::ASimpleCharacter() :
 	// Movement parameters
 	BaseMovementSpeed(650.f),
 	RunSpeed(1200.f),
-	WalkSpeed(650.f),
 	bIsRunning(false),
 	RollHoldTime(1.f),
 	bRollButtonPressed(false)
@@ -54,6 +53,8 @@ ASimpleCharacter::ASimpleCharacter() :
 void ASimpleCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 	
 }
 
@@ -153,7 +154,7 @@ void ASimpleCharacter::SetRollTimer()
 void ASimpleCharacter::Run()
 {
 	bIsRunning = true;
-	BaseMovementSpeed = RunSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
 
 	if (GEngine)
 	{
@@ -164,7 +165,7 @@ void ASimpleCharacter::Run()
 void ASimpleCharacter::StopRunning()
 {
 	bIsRunning = false;
-	BaseMovementSpeed = WalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 
 	if (GEngine)
 	{
