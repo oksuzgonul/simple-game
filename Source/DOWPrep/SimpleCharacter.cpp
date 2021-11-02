@@ -173,6 +173,7 @@ void ASimpleCharacter::Roll()
 		FVector Velocity = GetVelocity();
 		Velocity.Z = 0;
 		float Speed = Velocity.Size();
+
 		if (Speed == 0)
 		{
 			Section = FName(TEXT("BackStep"));
@@ -188,6 +189,37 @@ void ASimpleCharacter::Roll()
 void ASimpleCharacter::CharacterRollingStart()
 {
 	CharacterState = ECharacterState::ECS_Rolling;
+	if (Controller != nullptr)
+	{
+		// Launch the character forward as the roll happens
+		// Get the forward direction of the character
+		const FRotator Rotation{ GetActorRotation() };
+
+		// Rotation.Yaw is between 0 to 360
+		const FRotator YawRotation{ 0, Rotation.Yaw, 0 };
+
+		const FVector Direction{ FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::X) };
+
+		LaunchCharacter(Direction * 5000, false, false);
+	}
+}
+
+void ASimpleCharacter::CharacterBackStepStart()
+{
+	CharacterState = ECharacterState::ECS_Rolling;
+	if (Controller != nullptr)
+	{
+		// Launch the character backward as the backstep happens
+		// Get the forward direction of the character
+		const FRotator Rotation{ GetActorRotation() };
+
+		// Rotation.Yaw is between 0 to 360
+		const FRotator YawRotation{ 0, Rotation.Yaw, 0 };
+
+		const FVector Direction{ FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::X) };
+
+		LaunchCharacter(Direction * -1000, false, false);
+	}
 }
 
 void ASimpleCharacter::CharacterRollingEnd()

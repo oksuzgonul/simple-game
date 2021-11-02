@@ -76,6 +76,9 @@ protected:
 	void CharacterRollingStart();
 
 	UFUNCTION(BlueprintCallable)
+	void CharacterBackStepStart();
+
+	UFUNCTION(BlueprintCallable)
 	void CharacterRollingEnd();
 
 private:
