@@ -101,6 +101,9 @@ private:
 	// is the RollRun button pressed?
 	bool bRollButtonPressed;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	class UAnimMontage* RollMontage;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -155,29 +155,22 @@ void ASimpleCharacter::Run()
 {
 	bIsRunning = true;
 	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Started Running..."));
-	}
 }
 
 void ASimpleCharacter::StopRunning()
 {
 	bIsRunning = false;
 	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Stopped Running!"));
-	}
 }
 
 void ASimpleCharacter::Roll()
 {
-	if (GEngine)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	FName Section = FName(TEXT("Roll"));
+	if (AnimInstance && RollMontage)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Rolling..."));
+		AnimInstance->Montage_Play(RollMontage);
+		AnimInstance->Montage_JumpToSection(Section, RollMontage);
 	}
 }
 
