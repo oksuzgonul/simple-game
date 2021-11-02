@@ -17,9 +17,10 @@ ASimpleCharacter::ASimpleCharacter() :
 	// Movement parameters
 	BaseMovementSpeed(650.f),
 	RunSpeed(1200.f),
-	bIsRunning(false),
 	RollHoldTime(1.f),
-	bRollButtonPressed(false)
+	bRollButtonPressed(false),
+	// Character State
+	CharacterState(ECharacterState::ECS_Unoccupied)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -60,7 +61,7 @@ void ASimpleCharacter::BeginPlay()
 
 void ASimpleCharacter::MoveForward(float Value)
 {
-	if ((Controller != nullptr) && (Value != 0.0f))
+	if ((Controller != nullptr) && (Value != 0.0f) && (CharacterState == ECharacterState::ECS_Unoccupied || CharacterState == ECharacterState::ECS_Running))
 	{
 		// Get the forward direction
 		const FRotator Rotation{ Controller->GetControlRotation() };
@@ -75,7 +76,7 @@ void ASimpleCharacter::MoveForward(float Value)
 
 void ASimpleCharacter::MoveRight(float Value)
 {
-	if ((Controller != nullptr) && (Value != 0.0f))
+	if ((Controller != nullptr) && (Value != 0.0f) && (CharacterState == ECharacterState::ECS_Unoccupied || CharacterState == ECharacterState::ECS_Running))
 	{
 		// Get the forward direction
 		const FRotator Rotation{ Controller->GetControlRotation() };
@@ -122,7 +123,7 @@ void ASimpleCharacter::RollRunPressed()
 
 void ASimpleCharacter::RollRunHold()
 {
-	if (bRollButtonPressed)
+	if (bRollButtonPressed && (CharacterState == ECharacterState::ECS_Unoccupied || CharacterState == ECharacterState::ECS_Running))
 	{
 		Run();
 		SetRollTimer();
@@ -132,7 +133,7 @@ void ASimpleCharacter::RollRunHold()
 void ASimpleCharacter::RollRunReleased()
 {
 	bRollButtonPressed = false;
-	if (bIsRunning)
+	if (CharacterState == ECharacterState::ECS_Running)
 	{
 		StopRunning();
 	}
@@ -153,25 +154,38 @@ void ASimpleCharacter::SetRollTimer()
 
 void ASimpleCharacter::Run()
 {
-	bIsRunning = true;
+	CharacterState = ECharacterState::ECS_Running;
 	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
 }
 
 void ASimpleCharacter::StopRunning()
 {
-	bIsRunning = false;
+	CharacterState = ECharacterState::ECS_Unoccupied;
 	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 }
 
 void ASimpleCharacter::Roll()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	FName Section = FName(TEXT("Roll"));
-	if (AnimInstance && RollMontage)
+	if (CharacterState == ECharacterState::ECS_Unoccupied || CharacterState == ECharacterState::ECS_Running) 
 	{
-		AnimInstance->Montage_Play(RollMontage);
-		AnimInstance->Montage_JumpToSection(Section, RollMontage);
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		FName Section = FName(TEXT("Roll"));
+		if (AnimInstance && RollMontage)
+		{
+			AnimInstance->Montage_Play(RollMontage);
+			AnimInstance->Montage_JumpToSection(Section, RollMontage);
+		}
 	}
+}
+
+void ASimpleCharacter::CharacterRollingStart()
+{
+	CharacterState = ECharacterState::ECS_Rolling;
+}
+
+void ASimpleCharacter::CharacterRollingEnd()
+{
+	CharacterState = ECharacterState::ECS_Unoccupied;
 }
 
 // Called every frame

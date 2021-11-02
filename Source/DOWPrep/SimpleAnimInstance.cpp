@@ -22,6 +22,6 @@ void USimpleAnimInstance::UpdateAnimationProperties(float DeltaTime)
 		FVector Velocity{ SimpleCharacter->GetVelocity() };
 		Velocity.Z = 0;
 		Speed = Velocity.Size();
-		bIsRunning = SimpleCharacter->IsRunning();
+		bIsRunning = (SimpleCharacter->GetCharacterState() == ECharacterState::ECS_Running);
 	}
 }

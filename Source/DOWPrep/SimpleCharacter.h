@@ -6,6 +6,16 @@
 #include "GameFramework/Character.h"
 #include "SimpleCharacter.generated.h"
 
+UENUM(BlueprintType)
+enum class ECharacterState : uint8
+{
+	ECS_Unoccupied UMETA(DisplayName = "Unoccupied"),
+	ECS_Running UMETA(DisplayName = "Running"),
+	ECS_Rolling UMETA(DisplayName = "Rolling"),
+
+	ECS_Max UMETA(DisplayName = "DefaultMAX")
+};
+
 UCLASS()
 class DOWPREP_API ASimpleCharacter : public ACharacter
 {
@@ -62,6 +72,12 @@ protected:
 	/** Character performs a roll */
 	void Roll();
 
+	UFUNCTION(BlueprintCallable)
+	void CharacterRollingStart();
+
+	UFUNCTION(BlueprintCallable)
+	void CharacterRollingEnd();
+
 private:
 	// Follow camera will be mounted on the camera boom
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -93,8 +109,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	float RunSpeed;
 
-	// is the character running?
-	bool bIsRunning;
+	// Timer to activate roll
 	FTimerHandle RollHoldTimer;
 	float RollHoldTime;
 
@@ -104,6 +119,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	class UAnimMontage* RollMontage;
 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	ECharacterState CharacterState;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -111,5 +129,5 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	FORCEINLINE bool IsRunning() const { return bIsRunning; }
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 };
