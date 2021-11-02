@@ -170,6 +170,13 @@ void ASimpleCharacter::Roll()
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		FName Section = FName(TEXT("Roll"));
+		FVector Velocity = GetVelocity();
+		Velocity.Z = 0;
+		float Speed = Velocity.Size();
+		if (Speed == 0)
+		{
+			Section = FName(TEXT("BackStep"));
+		}
 		if (AnimInstance && RollMontage)
 		{
 			AnimInstance->Montage_Play(RollMontage);
