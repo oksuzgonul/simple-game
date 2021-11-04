@@ -12,6 +12,7 @@ enum class ECharacterState : uint8
 	ECS_Unoccupied UMETA(DisplayName = "Unoccupied"),
 	ECS_Running UMETA(DisplayName = "Running"),
 	ECS_Rolling UMETA(DisplayName = "Rolling"),
+	ECS_Attacking UMETA(DisplayName = "Attacking"),
 
 	ECS_Max UMETA(DisplayName = "DefaultMAX")
 };
@@ -81,6 +82,16 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void CharacterRollingEnd();
 
+	/** Character light attack action is executed in this function */
+	void AttackLight();
+
+	/** Character heavy attack action is executed in this function */
+	void AttackHeavy();
+
+	/** Switches off the CharacterState ECS_Attacking once the attack animation is complete */
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
+
 private:
 	// Follow camera will be mounted on the camera boom
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -124,6 +135,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	ECharacterState CharacterState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* AttackMontage;
 
 public:	
 	// Called every frame

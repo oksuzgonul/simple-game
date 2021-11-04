@@ -123,7 +123,9 @@ void ASimpleCharacter::RollRunPressed()
 
 void ASimpleCharacter::RollRunHold()
 {
-	if (bRollButtonPressed && (CharacterState == ECharacterState::ECS_Unoccupied || CharacterState == ECharacterState::ECS_Running))
+	if (bRollButtonPressed 
+		&& (CharacterState == ECharacterState::ECS_Unoccupied 
+			|| CharacterState == ECharacterState::ECS_Running))
 	{
 		Run();
 		SetRollTimer();
@@ -166,7 +168,8 @@ void ASimpleCharacter::StopRunning()
 
 void ASimpleCharacter::Roll()
 {
-	if (CharacterState == ECharacterState::ECS_Unoccupied || CharacterState == ECharacterState::ECS_Running) 
+	if (CharacterState == ECharacterState::ECS_Unoccupied 
+		|| CharacterState == ECharacterState::ECS_Running) 
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		FName Section = FName(TEXT("Roll"));
@@ -227,6 +230,47 @@ void ASimpleCharacter::CharacterRollingEnd()
 	CharacterState = ECharacterState::ECS_Unoccupied;
 }
 
+void ASimpleCharacter::AttackLight()
+{
+	if (CharacterState == ECharacterState::ECS_Running
+		|| CharacterState == ECharacterState::ECS_Unoccupied)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		FName Section = FName(TEXT("AttackLight"));
+
+		CharacterState = ECharacterState::ECS_Attacking;
+
+		if (AnimInstance && AttackMontage)
+		{
+			AnimInstance->Montage_Play(AttackMontage);
+			AnimInstance->Montage_JumpToSection(Section, AttackMontage);
+		}
+	}
+}
+
+void ASimpleCharacter::AttackHeavy()
+{
+	if (CharacterState == ECharacterState::ECS_Running
+		|| CharacterState == ECharacterState::ECS_Unoccupied)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		FName Section = FName(TEXT("AttackHeavy"));
+
+		CharacterState = ECharacterState::ECS_Attacking;
+
+		if (AnimInstance && AttackMontage)
+		{
+			AnimInstance->Montage_Play(AttackMontage);
+			AnimInstance->Montage_JumpToSection(Section, AttackMontage);
+		}
+	}
+}
+
+void ASimpleCharacter::AttackEnd()
+{
+	CharacterState = ECharacterState::ECS_Unoccupied;
+}
+
 // Called every frame
 void ASimpleCharacter::Tick(float DeltaTime)
 {
@@ -250,5 +294,8 @@ void ASimpleCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAction("RollRun", IE_Pressed, this, &ASimpleCharacter::RollRunPressed);
 	PlayerInputComponent->BindAction("RollRun", IE_Released, this, &ASimpleCharacter::RollRunReleased);
+
+	PlayerInputComponent->BindAction("AttackLight", IE_Pressed, this, &ASimpleCharacter::AttackLight);
+	PlayerInputComponent->BindAction("AttackHeavy", IE_Pressed, this, &ASimpleCharacter::AttackHeavy);
 }
 
